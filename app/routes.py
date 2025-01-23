@@ -6,16 +6,26 @@ from app.models import Player, Match, MatchPlayer
 
 bp = Blueprint('main', __name__)
 
-def format_player_name(name):
+def format_player_name(name, all_names):
     parts = name.split()
+    first_name = parts[0]
     if len(parts) > 1:
-        return f"{parts[0]} {parts[1][0]}."
-    return name
+        last_initial = parts[1][0]
+        # Check if there are other players with the same first name
+        same_first_name_count = sum(1 for n in all_names if n.split()[0] == first_name)
+        if same_first_name_count > 1:
+            return f"{first_name} {last_initial}."
+    return first_name
+
+@bp.app_template_filter('format_player_name')
+def format_player_name_filter(name, all_names):
+    return format_player_name(name, all_names)
 
 @bp.route('/')
 def home():
     matches = Match.query.all()
     players = Player.query.all()
+    player_names = [player.name for player in players]
 
     # Calculate statistics
     total_matches = len(matches)
@@ -60,13 +70,24 @@ def home():
         team_stats=team_stats,
         player_match_count=player_match_count,
         player_pairs=player_pairs,
-        players=players
+        players=players,
+        player_names=player_names
     )
 
 @bp.route('/players')
 def players():
-    players = Player.query.all()
-    return render_template('player_list.html', players=players)
+    sort_by = request.args.get('sort_by', 'name')  # Default sorting by name
+    order = request.args.get('order', 'asc')
+
+    query = Player.query
+    if sort_by in ['name', 'school']:
+        if order == 'desc':
+            query = query.order_by(getattr(Player, sort_by).desc())
+        else:
+            query = query.order_by(getattr(Player, sort_by).asc())
+
+    players = query.all()
+    return render_template('player_list.html', players=players, sort_by=sort_by, order=order)
 
 @bp.route('/add_player', methods=['GET', 'POST'])
 def add_player():

@@ -60,8 +60,30 @@
             <thead class="table-dark">
                 <tr>
                     <th scope="col">#</th>
-                    <th scope="col">Player Name</th>
-                    <th scope="col">School</th>
+                    <th scope="col">
+                        <a href="{{ url_for('main.players', sort_by='name', order='asc' if sort_by != 'name' or order == 'desc' else 'desc') }}">
+                            Player Name
+                            {% if sort_by == 'name' %}
+                                {% if order == 'asc' %}
+                                    &#9650;
+                                {% else %}
+                                    &#9660;
+                                {% endif %}
+                            {% endif %}
+                        </a>
+                    </th>
+                    <th scope="col">
+                        <a href="{{ url_for('main.players', sort_by='school', order='asc' if sort_by != 'school' or order == 'desc' else 'desc') }}">
+                            School
+                            {% if sort_by == 'school' %}
+                                {% if order == 'asc' %}
+                                    &#9650;
+                                {% else %}
+                                    &#9660;
+                                {% endif %}
+                            {% endif %}
+                        </a>
+                    </th>
                     <th scope="col">Actions</th>
                 </tr>
             </thead>

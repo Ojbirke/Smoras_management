@@ -125,14 +125,14 @@
                         <tr>
                             <th>Player</th>
                             {% for player in players %}
-                            <th>{{ player.name|format_player_name }}</th>
+                            <th>{{ player.name|format_player_name(player_names) }}</th>
                             {% endfor %}
                         </tr>
                     </thead>
                     <tbody>
                         {% for player1 in players %}
                         <tr>
-                            <td>{{ player1.name|format_player_name }}</td>
+                            <td>{{ player1.name|format_player_name(player_names) }}</td>
                             {% for player2 in players %}
                             <td>
                                 {% if player1.name == player2.name %}
